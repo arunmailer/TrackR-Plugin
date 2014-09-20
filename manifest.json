@@ -1,0 +1,14 @@
+{
+  "name": "A browser action to track and update tweets",
+  "description": "Changes the tweets selectively",
+  "version": "1.0",
+  "permissions": [
+    "tabs", "http://twitter.com", "https://twitter.com/*"
+  ],
+  "browser_action": {
+      "default_title": "TrackR",
+      "default_icon": "blood_clipart.png",
+      "default_popup": "popup.html"
+  },
+  "manifest_version": 2
+}
