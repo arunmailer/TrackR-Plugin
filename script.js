@@ -54,6 +54,7 @@ var runscript = function() {
                     console.log(tweetid);
                     console.log(tweetScreen);
                     console.log(tweet);
+                    fetchStatus(tweetid, tweetScreen, tweet);
                 }
                 break;
             }
@@ -63,6 +64,18 @@ var runscript = function() {
      //console.log(count);
      setTimeout(runscript, 30000);
 };
+
+function fetchStatus(tweetId, handle, tweet) {
+    var promise = $.post("http://localhost:3500/api/twitter/search", {tweetId: tweetId, handle: handle, tweet: tweet});
+    promise.done(function(data) {
+        if (data != null) {
+            var status = data.status;
+            $("div[data-tweet-id='" + tweetId + "']").append("Status: " + status);
+        } else {
+            $("div[data-tweet-id='" + tweetId + "']").append("Status: Not being tracked");
+        }
+    });
+}
 
  runscript();
 //document.body.addEventListener("DOMNodeInserted", runscript, false);
