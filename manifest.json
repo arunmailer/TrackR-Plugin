@@ -1,6 +1,6 @@
 {
-  "name": "A plugin to track and update tweets",
-  "description": "Changes the tweets selectively",
+  "name": "TrackR",
+  "description": "Adds status to your tweets",
   "version": "1.0",
   "permissions": [
     "tabs", "http://twitter.com/", "https://twitter.com/*"
