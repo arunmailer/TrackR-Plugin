@@ -1,6 +1,10 @@
+var lastTweetid = 0;
 var runscript = function() {
     var Tlist = document.getElementById("stream-items-id").getElementsByTagName("li");
-    //var count = 0;
+    var count = 0;
+    var firstTweet = true;
+    var lastTweet = 0;
+    var curTweet = 0;
     for (var i = 0; i < Tlist.length; i++) {
         var pList = Tlist[i].getElementsByTagName("p");
         for (var j = 0; j < pList.length; j++) {
@@ -11,12 +15,51 @@ var runscript = function() {
             for (var k = 0; k < dList.length; k++) {
                 var tweetid = dList[k].getAttribute("data-tweet-id");
                 var tweetScreen = dList[k].getAttribute("data-screen-name");
+                var retweetid = dList[k].getAttribute("data-retweet-id");
                 //console.log(tweetid);
                 //console.log(tweetScreen);
+                if (firstTweet)
+                {
+                    firstTweet = false;
+                    if (retweetid)
+                    {
+                        //console.log(retweetid);
+                        lastTweet = retweetid;
+                        curTweet = retweetid;
+                    }
+                    else
+                    {
+                        //console.log("not retweet");
+                        lastTweet = tweetid;
+                        curTweet = tweetid;
+                    }
+                }
+                else
+                {
+                    if (retweetid)
+                    {
+                        //console.log(retweetid);
+                        curTweet = retweetid;
+                    }
+                    else
+                    {
+                        //console.log("not retweet");
+                        curTweet = tweetid;
+                    }
+                }
+                if (curTweet > lastTweetid)
+                {
+                    count++;
+                    //console.log(curTweet);
+                    console.log(tweetid);
+                    console.log(tweetScreen);
+                    console.log(tweet);
+                }
                 break;
             }
         }
      }
+     lastTweetid = lastTweet;
      //console.log(count);
      setTimeout(runscript, 30000);
 };
