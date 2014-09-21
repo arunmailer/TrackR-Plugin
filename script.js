@@ -1,82 +1,68 @@
-var lastTweetid = 0;
-var runscript = function() {
-    var Tlist = document.getElementById("stream-items-id").getElementsByTagName("li");
-    var count = 0;
-    var firstTweet = true;
-    var lastTweet = 0;
-    var curTweet = 0;
-    for (var i = 0; i < Tlist.length; i++) {
-        var pList = Tlist[i].getElementsByTagName("p");
-        for (var j = 0; j < pList.length; j++) {
-            var tweet = pList[j].textContent;
-            //console.log(tweet);
-            //count++;
-            var dList = Tlist[i].getElementsByTagName("div");
-            for (var k = 0; k < dList.length; k++) {
-                var tweetid = dList[k].getAttribute("data-tweet-id");
-                var tweetScreen = dList[k].getAttribute("data-screen-name");
-                var retweetid = dList[k].getAttribute("data-retweet-id");
-                //console.log(tweetid);
-                //console.log(tweetScreen);
-                if (firstTweet)
-                {
-                    firstTweet = false;
-                    if (retweetid)
-                    {
-                        //console.log(retweetid);
-                        lastTweet = retweetid;
-                        curTweet = retweetid;
-                    }
-                    else
-                    {
-                        //console.log("not retweet");
-                        lastTweet = tweetid;
-                        curTweet = tweetid;
-                    }
-                }
-                else
-                {
-                    if (retweetid)
-                    {
-                        //console.log(retweetid);
-                        curTweet = retweetid;
-                    }
-                    else
-                    {
-                        //console.log("not retweet");
-                        curTweet = tweetid;
-                    }
-                }
-                if (curTweet > lastTweetid)
-                {
-                    count++;
-                    //console.log(curTweet);
-                    console.log(tweetid);
-                    console.log(tweetScreen);
-                    console.log(tweet);
-                    fetchStatus(tweetid, tweetScreen, tweet);
-                }
-                break;
-            }
-        }
-     }
-     lastTweetid = lastTweet;
-     //console.log(count);
-     setTimeout(runscript, 30000);
-};
+function initUI() {
+    $(".nav.right-actions").append('<li><button type="button" class="UserActions-editButton edit-button btn" data-scribe-element="profile_edit_button" style="padding: 10px; margin-left: 10px; margin-top: 5px;" id="btnStatus"><span class="button-text">Status</span></button></li>');
 
-function fetchStatus(tweetId, handle, tweet) {
-    var promise = $.post("http://localhost:3500/api/twitter/search", {tweetId: tweetId, handle: handle, tweet: tweet});
-    promise.done(function(data) {
-        if (data != null) {
-            var status = data.status;
-            $("div[data-tweet-id='" + tweetId + "']").append("Status: " + status);
-        } else {
-            $("div[data-tweet-id='" + tweetId + "']").append("Status: Not being tracked");
-        }
+    $("#btnStatus").on("click", function() {
+        extractTweets();
     });
 }
 
- runscript();
-//document.body.addEventListener("DOMNodeInserted", runscript, false);
-//document.body.addEventListener("DOMNodeInsertedIntoDocument", runscript, true);
+initUI();
+
+function extractTweets() {
+    var tweets = $("div[data-tweet-id]");
+    for (var i = 0; i < tweets.length; i++) {
+        var tweet = $(tweets[i]).find('p.js-tweet-text').text();
+        var tweetId = $(tweets[i]).data("tweetId");
+        var handle = $(tweets[i]).data("screenName");
+
+        fetchStatus(tweetId, handle, tweet);
+    }
+}
+
+function fetchStatus(tweetId, handle, tweet) {
+    var promise = $.post("http://localhost:3500/api/twitter/search", {tweetId: tweetId, handle: handle, tweet: tweet});
+    promise.always(function(res) {
+        var baseUrl = "http://localhost:3500/img/";
+        if (res == null) {
+            return;
+        }
+
+        $("div[data-tweet-id='" + tweetId + "']").find('.trackr-actions').remove();
+        if (res.matchMethod == "tweetId") {
+            var status = res.data.status;
+            var type = res.data.type;
+            if (status == "closed") {
+                $("div[data-tweet-id='" + tweetId + "']").find('.js-actions').hide();
+                $("div[data-tweet-id='" + tweetId + "']").append("<div class='trackr-actions' style='margin-left: 30px; margin-top: 5px; padding-top: 10px; border-top: dashed 1px #AAA;'>" +
+                                                                    "<img src='" + baseUrl + type + "-32.png'/>&nbsp;<div style='margin-top: -32px; margin-left: 45px'><strong>TrackR</strong>: This tweet is no longer valid. Please don't share it.</div>" +
+                                                                "</div>");
+            } else {
+                $("div[data-tweet-id='" + tweetId + "']").append("<div class='trackr-actions' style='margin-left: 30px; margin-top: 5px; padding-top: 10px; border-top: dashed 1px #AAA;'>" +
+                                                                    "<img src='" + baseUrl + type + "-32.png'/>&nbsp;<div style='margin-top: -32px; margin-left: 45px'><strong>TrackR</strong>: This tweet is still open. Please RT.</div>" + 
+                                                                "</div>");
+            }
+        } else if (res.matchMethod == "fuzzy") {
+            if (res.data == null) {
+                var type = res.matchType;
+                $("div[data-tweet-id='" + tweetId + "']").append("<div class='trackr-actions' style='margin-left: 30px; margin-top: 5px; padding-top: 10px; border-top: dashed 1px #AAA;'>" +
+                                                                    "<img src='" + baseUrl + type + "-32.png'/>&nbsp;<div style='margin-top: -32px; margin-left: 45px'><strong>TrackR</strong>: This tweet is not being tracked.</div>" + 
+                                                                "</div>");
+            } else {
+                var status = res.data.status;
+                var type = res.data.type;
+                var url = res.data.url;
+                if (status == "closed") {
+                    $("div[data-tweet-id='" + tweetId + "']").find('.js-actions').hide();
+                    $("div[data-tweet-id='" + tweetId + "']").append("<div class='trackr-actions' style='margin-left: 30px; margin-top: 5px; padding-top: 10px; border-top: dashed 1px #AAA;'>" +
+                                                                        "<img src='" + baseUrl + type + "-32.png'/>&nbsp;<div style='margin-top: -32px; margin-left: 45px'><strong>TrackR</strong>: We found a <a href='" + url + "' target='_blank'>similar tweet</a> which is no longer valid. Please don't share it.</div>" + 
+                                                                    "</div>");
+                } else {
+                    $("div[data-tweet-id='" + tweetId + "']").append("Status of a similar tweet: " + status);
+                    $("div[data-tweet-id='" + tweetId + "']").append("<div class='trackr-actions' style='margin-left: 30px; margin-top: 5px; padding-top: 10px; border-top: dashed 1px #AAA;'>" +
+                                                                        "<img src='" + baseUrl + type + "-32.png'/>&nbsp;<div style='margin-top: -32px; margin-left: 45px'><strong>TrackR</strong>: We found a <a href='" + url + "' target='_blank'>similar tweet</a> which is still open. Please don't share it.</div>" + 
+                                                                    "</div>");
+                }
+            }
+        }
+    });
+}
