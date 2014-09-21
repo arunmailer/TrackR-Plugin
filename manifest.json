@@ -9,6 +9,10 @@
     {
       "matches": ["http://twitter.com/", "https://twitter.com/*"],
       "js": ["jquery-1.11.1.min.js", "script.js"]
+    },
+    {
+      "matches": ["http://*.facebook.com/*", "https://*.facebook.com/*"],
+      "js": ["jquery-1.11.1.min.js", "fb-script.js"]
     }
   ],
   "manifest_version": 2

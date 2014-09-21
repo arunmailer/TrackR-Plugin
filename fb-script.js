@@ -1,8 +1,8 @@
 var nextCabInfo = '4 minutes away.'; // Hard coding it as OLA doesn't support CORS
 function initUI() {
-    $(".nav.right-actions").append('<li><button type="button" class="UserActions-editButton edit-button btn" data-scribe-element="profile_edit_button" style="padding: 10px; margin-left: 10px; margin-top: 5px;" id="btnStatus"><span class="button-text">Status</span></button></li>');
-
-    $("#btnStatus").on("click", function() {
+    $("#blueBarNAXAnchor ul").append('<li class="_2pdh _3zm- _55bi _3zm- _55bh"><a class="_1ayn" id="btnStatus">TrackR<div class="_5ah- _5ahy"><div class="_5ahz"></div></div></a></li>');
+    console.log($("#btnStatus"));
+    $(document).on("click", "#btnStatus", function() {
         nextCabInfo = '';
         $.ajax({
             url: 'http://console.olacabs.com/city/3/category/1/availability.json?lat=12.967166&lng=77.595566',
@@ -26,29 +26,29 @@ function initUI() {
         })
         .always(function() {
             console.log("complete");
-            extractTweets();
+            extractPosts();
         });
+
+        return false;
     });
-    extractTweets();
+    extractPosts();
 }
 
 initUI();
 
-function extractTweets() {
-    var tweets = $("div[data-tweet-id]");
-    for (var i = 0; i < tweets.length; i++) {
-        var tweet = $(tweets[i]).find('p.js-tweet-text').text();
-        var tweetId = $(tweets[i]).data("tweetId");
-        var handle = $(tweets[i]).data("screenName");
-
-        fetchStatus(tweetId, handle, tweet);
+function extractPosts() {
+    var posts = $(".userContentWrapper");
+    for (var i = 0; i < posts.length; i++) {
+        var post = $(posts[i]).text();
+        console.log(post);
+        //fetchStatus(99999999999, '', tweet);
     }
 }
 
 function fetchStatus(tweetId, handle, tweet) {
-    var promise = $.post("http://trackr.varunkumar.me/api/twitter/search", {tweetId: tweetId, handle: handle, tweet: tweet});
+    var promise = $.post("http://localhost:3500/api/twitter/search", {tweetId: tweetId, handle: handle, tweet: tweet});
     promise.always(function(res) {
-        var baseUrl = "http://trackr.varunkumar.me/img/";
+        var baseUrl = "http://localhost:3500/img/";
         if (res == null) {
             return;
         }
