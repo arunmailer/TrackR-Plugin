@@ -15,7 +15,7 @@ Installation Instructions
 License
 -------
 
-The source code is available [here](https://github.com/varunkumar/vbot) under [MIT licence](http://varunkumar.mit-license.org/). Please send any bugs, feedback, complaints, patches to arunmailer[at]gmail[dot]com, varunkumar[dot]n[at]gmail[dot]com.
+The source code is available [here](https://github.com/arunmailer/TrackR-Plugin) under [MIT licence](http://varunkumar.mit-license.org/). Please send any bugs, feedback, complaints, patches to arunmailer[at]gmail[dot]com, varunkumar[dot]n[at]gmail[dot]com.
 
 -- [Arun](http://arunkumarn.com),[Varun](http://www.varunkumar.me)
 
